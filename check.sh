@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# read function
+. ./regist_function.sh
+
 # arg1: main記述モジュール規格[esm,cjs]
 # arg2: main拡張子[.mts,.cts]
 # arg3: module記述モジュール規格[esm,cjs]
@@ -11,3 +14,8 @@
 
 # no1
 check esm .mts esm .mts module e n 1
+check esm .mts esm .mts module e 0 2
+check esm .mts esm .mts module n n 3
+check esm .mts esm .mts module n 0 4
+check esm .mts esm .mts module c n 5
+check esm .mts esm .mts module c 0 6

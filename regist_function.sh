@@ -13,10 +13,11 @@ function initfile {
 # arg7: tsconfig.moduleresolution[n:nodenext, 0:none]
 # arg8: test no
 function check {
+  rm -f dist/*
   settingModule main $1 $2
   settingModule Module $3 $4
-  tsc module ${5} ${6} ${7}  > "./test/${8}_comp_result" 2>&1
-  node dist/main.mts > "./test/${8}_run_result" 2>&1
+  tsc ${5} ${6} ${7}  > "./test/${8}_comp_result" 2>&1
+  node dist/main${2//t/j} > "./test/${8}_run_result" 2>&1
 }
 
 # arg1: ファイル名[main,Module]
