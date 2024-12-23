@@ -4,6 +4,15 @@ function initfile {
   rm -f ts/* dist/*
 }
 
+# arg1: main記述モジュール規格[esm,cjs]
+# arg2: main拡張子[.mts,.cts]
+# arg3: module記述モジュール規格[esm,cjs]
+# arg4: module拡張子[.mts,.cts]
+function settingmodules {
+  settingModule main $1 $2
+  settingModule Module $3 $4
+}
+
 # arg1: ファイル名[main,Module]
 # arg2: 記述モジュール規格[esm,cjs]
 # arg3: 拡張子[.mts,.cts]
