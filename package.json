@@ -2,15 +2,22 @@
   "name": "js_module",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc:en": "tsc --module esnext --noemit --moduleResolution",
+    "tsc:e": "tsc --module esnext --moduleResolution nodenext",
+    "tsc:nn": "tsc --module nodenext --noemit --moduleResolution",
+    "tsc:n": "tsc --module nodenext --moduleResolution nodenext",
+    "tsc:cn": "tsc --module commonjs --noemit --moduleResolution",
+    "tsc:c": "tsc --module commonjs --moduleResolution nodenext"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/node": "^22.10.2",
     "typescript": "^5.7.2"
   }
 }

@@ -1,28 +1,35 @@
 #!/bin/bash
 
-# tsconfigとpackage内のモジュール設定を変更
-# arg1: compiled module[esm or other]
-# arg2: running module[esm or other]
-function setting {
-  COMPILED_MODULE="CommonJS"
-  RUN_MODULE="commonjs"
-  if [ "$1" == "esm" ]; then COMPILED_MODULE="ESNext"; fi
-  if [ "$2" == "esm" ]; then RUN_MODULE="module"; fi
-  sed -Ei "s/(\"module\": ).*/\1\"${COMPILED_MODULE}\",/" tsconfig.json
-  sed -Ei "s/(\"type\": ).*/\1\"${RUN_MODULE}\",/" package.json
+function initfile {
+  rm -f ts/* dist/*
 }
-# 検証結果をファイル出力する
-# arg1: source module[free]
-# arg2: conpiled module[esm or other]
-# arg3: running module[esm or other]
-function module_test {
-  src=$1
-  cmp=$2
-  run=$3
-  setting "${cmp}" "${run}" && npx tsc
-  dir="${src}-${cmp}-${run}"
-  mkdir -p test
-  rm -rf ./test/${dir}
-  cp -r ./dist/ ./test/${dir}
-  node dist/main.js > "./test/${dir}/result" 2>&1
+
+# arg1: ファイル名[main,Module]
+# arg2: 記述モジュール規格[esm,cjs]
+# arg3: 拡張子[.mts,.cts]
+function settingModule {
+  FILE=$1
+  MODULE=$2
+  EXTEND=$3
+  ORG_EXTEND=".cjs"
+  if [ $MODULE == "esm" ]; then
+    ORG_EXTEND=".mts"
+  fi
+  cp org/${FILE}${ORG_EXTEND} ts/${FILE}${EXTEND}
+
+  #main
+  if [ $FILE == "main" ]; then
+    sed -Ei "s/module/Module${EXTEND//t/j}/" ts/${FILE}${EXTEND}
+  fi
+}
+
+# arg1: running module[module,commonjs]
+# arg2: tsconfig.module[e:esnext, n:nodenext, c:commonjs]
+# arg3: tsconfig.moduleresolution[n:nodenext, :none]
+function tsc {
+  RUN_MODULE=$1
+  MODULE=$2
+  MODULE_RESOL=$3
+  sed -Ei "s/(\"type\": ).*/\1\"${RUN_MODULE}\",/" package.json
+  npm run "tsc:${MODULE}${MODULE_RESOL}"
 }
