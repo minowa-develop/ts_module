@@ -62,16 +62,19 @@ function tsc {
 function validate {
   #  echo $@ # debug
   # validate for ts
+  MSG=""
   if [ $7 == "n" ] && [ $6 != "n" ]; then
-    echo "${8} TS5110"
-    return 1
+    MSG="${MSG} TS5110"
   fi
   if [ $6 == "n" ] && [ $1 == "esm" ] && [ $2 == ".cts" ] && [ $4 == ".mts" ]; then
-    echo "${8} TS1479"
-    return 1
+    MSG="${MSG} TS1479"
   fi
   if [ $1 == "esm" ] && [ $3 == "cjs" ]; then
-    echo "${8} TS2459"
+    MSG="${MSG} TS2459"
+  fi
+
+  if [ ${#MSG} -gt 1 ]; then
+    echo "${8}${MSG}"
     return 1
   fi
 }
