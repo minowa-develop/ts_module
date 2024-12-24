@@ -12,7 +12,8 @@
 # arg7: tsconfig.moduleresolution[n:nodenext, 0:none]
 # arg8: test no
 
-# no1
+mkdir -p ts test
+
 check esm .mts esm .mts module e n 1
 check esm .mts esm .mts module e 0 2
 check esm .mts esm .mts module n n 3
