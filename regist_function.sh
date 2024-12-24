@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function initfile {
-  rm -f ts/* dist/* test/*
+  rm -f ts/* dist/* test/* tmp
 }
 
 # arg1: main記述モジュール規格[esm,cjs]
@@ -17,8 +17,8 @@ function check {
   settingFile main $1 $2
   settingFile Module $3 $4
   injectionImport $2 $4
-  # validate $@; # debug
-  if ! validate $@; then return 1; fi
+  validate $@; # debug
+  # if ! validate $@; then return 1; fi
   tsc ${5} ${6} ${7}  > "./test/${8}_comp_result" 2>&1 && \
   node dist/main${2//t/j} > "./test/${8}_run_result" 2>&1
   # grep -H err "./test/${8}_comp_result" # debug 漏れ確認
@@ -65,6 +65,8 @@ function validate {
   MSG=""
   if [ $7 == "n" ] && [ $6 != "n" ]; then
     MSG="${MSG} TS5110"
+    echo "${8}${MSG}"
+    return 1
   fi
   if [ $6 == "n" ] && [ $1 == "esm" ] && [ $2 == ".cts" ] && [ $4 == ".mts" ]; then
     MSG="${MSG} TS1479"
@@ -77,4 +79,10 @@ function validate {
     echo "${8}${MSG}"
     return 1
   fi
+  echo "${8}"
+}
+
+# validate検証用 ./check.sh > tmp
+function err {
+  diff <(grep $1 tmp | awk '{print $1}') <(grep $1 test/*_comp_result | sed -E "s/test\/([0-9]+)_.+/\1/g" | sort -h)
 }

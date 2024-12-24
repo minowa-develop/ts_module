@@ -13,7 +13,7 @@
 # arg8: test no
 
 mkdir -p ts test
-rm test/*
+rm -f ts/* test/*
 
 check esm .mts esm .mts module e n 1
 check esm .mts esm .mts module e 0 2
