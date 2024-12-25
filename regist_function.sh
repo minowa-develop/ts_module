@@ -17,11 +17,12 @@ function check {
   settingFile main $1 $2
   settingFile Module $3 $4
   injectionImport $2 $4
-  validate $@; # debug
-  # if ! validate $@; then return 1; fi
-  tsc ${5} ${6} ${7}  > "./test/${8}_comp_result" 2>&1 && \
+  # validate $@ # debug
+  # if ! validate > /dev/null $@; then return 1; fi
+  tsc ${5} ${6} ${7} > "./test/${8}_comp_result" 2>&1 && \
   node dist/main${2//t/j} > "./test/${8}_run_result" 2>&1
   # grep -H err "./test/${8}_comp_result" # debug 漏れ確認
+  analize $@
 }
 
 # arg1: ファイル名[main,Module]
@@ -62,27 +63,47 @@ function tsc {
 function validate {
   #  echo $@ # debug
   # validate for ts
-  MSG=""
   if [ $7 == "n" ] && [ $6 != "n" ]; then
-    MSG="${MSG} TS5110"
-    echo "${8}${MSG}"
+    echo "TS5110"
     return 1
   fi
+  MSG=""
   if [ $6 == "n" ] && [ $1 == "esm" ] && [ $2 == ".cts" ] && [ $4 == ".mts" ]; then
-    MSG="${MSG} TS1479"
+    MSG="${MSG},TS1479"
   fi
   if [ $1 == "esm" ] && [ $3 == "cjs" ]; then
-    MSG="${MSG} TS2459"
+    MSG="${MSG},TS2459"
   fi
 
   if [ ${#MSG} -gt 1 ]; then
-    echo "${8}${MSG}"
+    echo "${MSG}"
     return 1
   fi
-  echo "${8}"
 }
 
 # validate検証用 ./check.sh > tmp
 function err {
   diff <(grep $1 tmp | awk '{print $1}') <(grep $1 test/*_comp_result | sed -E "s/test\/([0-9]+)_.+/\1/g" | sort -h)
+}
+
+function file2No {
+  path=$1 # arg
+  if [ ${#path} -eq 0 ]; then
+    path=$(cat -) # pipe
+  fi
+  for i in ${path[@]};do
+    echo "${i##*/}" |sed -E "s/^([0-9]+).*/\1/g"
+  done
+}
+
+function analize {
+  main=cjs
+  if grep "import" "./dist/main${2//t/j}" > /dev/null; then
+    main=esm
+  fi
+  module=cjs
+  if grep "export class" "./dist/Module${4//t/j}" > /dev/null; then
+    module=esm
+  fi
+  echo "$@ \"$(validate $@)\" ${main} ${module} \"$(grep Err ./test/${8}_run_result 2> /dev/null)\"" > "./test/${8}_analyze"
 }
